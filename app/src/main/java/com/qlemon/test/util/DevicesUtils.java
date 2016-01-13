@@ -1,8 +1,11 @@
-package com.qlemon.autotest;
+package com.qlemon.test.util;
 
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.qlemon.test.MainActivity;
+import com.qlemon.test.bean.SerialPortSendData;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import android_serialport_api.SerialPort;
 
@@ -71,7 +73,7 @@ public class DevicesUtils {
                     size = mInputStream.read(buffer);
                     Log.i("TAG", "---------------mInputStream---------------" + mInputStream.available());
                     if (size > 0) { // 读取数据
-                        String str = StringUtils.bytesToHexString(buffer, size).trim().toLowerCase();
+                        String str = ConvertUtils.bytesToHexString(buffer, size).trim().toLowerCase();
                         sb.append(str);
                         Log.i("TAG", "OutputStream-->ComData"+sb.toString());
                         boolean flag = false;
@@ -98,10 +100,16 @@ public class DevicesUtils {
                                     && receiData.lastIndexOf(sendData.stopStr) > 0) {
                                 flag = true;
                             }
-                        } else if (sendData.special == SerialPortSendData.Signal.FIND_ID_CARD.ordinal()
-                                || sendData.special == SerialPortSendData.Signal.SELECT_ID_CARD.ordinal()) {
-                            //寻找身份证信息 或 选取身份证信息
-                            if (sb.toString().indexOf(sendData.stopStr) != -1) {
+                        } else if (sendData.special == SerialPortSendData.Signal.FIND_ID_CARD.ordinal()) {
+                            //寻找身份证信息
+                            Log.i("TAG", "FIND_CARD="+sb.toString());
+                            if (ConvertUtils.hexStringToBytes(sb.toString()).length == sendData.digitNum) {
+                                flag = true;
+                            }
+                        } else if (sendData.special == SerialPortSendData.Signal.SELECT_ID_CARD.ordinal()) {
+                            //选取身份证信息
+                            Log.i("TAG", "SELECT_CARD="+sb.toString());
+                            if (ConvertUtils.hexStringToBytes(sb.toString()).length == sendData.digitNum) {
                                 flag = true;
                             }
                         } else if (sendData.special == SerialPortSendData.Signal.READ_ID_CARD.ordinal()) {
@@ -148,7 +156,7 @@ public class DevicesUtils {
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
 
-            deviceThreadPool.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+//            deviceThreadPool.awaitTermination(timeout, TimeUnit.MILLISECONDS);
             if (null != listener) {
                 final Future<RecevedData> future = deviceThreadPool.submit(new ReadTask(sendData));
                 deviceThreadPool.submit(new Runnable() {
@@ -160,7 +168,7 @@ public class DevicesUtils {
                                 try {
                                     final RecevedData recevedData = future.get();
                                     if (null != recevedData) {
-                                        ((DeviceActivity) context)
+                                        ((MainActivity) context)
                                                 .runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -194,7 +202,7 @@ public class DevicesUtils {
         }
 
         // 上面是获取设置而已 下面这个才是发送指令
-        byte[] text = StringUtils.hexStringToBytes(sendData.commandStr);
+        byte[] text = ConvertUtils.hexStringToBytes(sendData.commandStr);
         try {
             mOutputStream.write(text);
             mOutputStream.flush();

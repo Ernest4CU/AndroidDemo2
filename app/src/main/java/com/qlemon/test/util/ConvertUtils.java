@@ -1,4 +1,6 @@
-package com.qlemon.autotest;
+package com.qlemon.test.util;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,7 +9,7 @@ import java.util.Date;
  * 字符串工具
  * @author JeanSit added at 2016-01-12
  */
-public class StringUtils {
+public class ConvertUtils {
 
 	/**
 	 * byte数组转为对应的16进制字符串
@@ -178,4 +180,25 @@ public class StringUtils {
 		}
 		return false;
 	}
+
+    /**
+     * 十六进制字符串转换成字节数组
+     * @param hex 十六进制字符串
+     * @param reverse 值true是从尾开始读取字符串，值false是从头开始读取字符串
+     * @return 字节数组
+     */
+    public static byte[] hexStringToByteArray(String hex, boolean reverse) {
+        StringBuilder sb = new StringBuilder();
+        if (reverse) {
+            for (int i=hex.length(); i>0; i--) {
+                sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i - 1, i), 16)), 4, '0'));
+            }
+        } else {
+            for (int i=0; i<hex.length(); i++) {
+                sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i, i+1), 16)), 4, '0'));
+            }
+        }
+
+        return sb.toString().getBytes();
+    }
 }

@@ -1,10 +1,10 @@
-package com.qlemon.autotest;
+package com.qlemon.test;
 
 /**
  * 常用指令项封装
  * @author JeanSit added at 2016-01-12
  */
-public class ScanConstants {
+public class DeviceConstants {
 
 	// ========================扫描枪==============================
 	/**
@@ -71,4 +71,36 @@ public class ScanConstants {
 	 * 检验码
 	 */
 	public static String LOCK_CHECK = "9b";
+
+	// ========================身份证信息==============================
+    /* UART 数据输入传输帧格式:
+     * 	Preamble Len1 Len2 CMD Para Data CHK_SUM
+     *
+     * UART 数据输出传输帧格式:
+     * 	Preamble ￼en1 Len2 SW1 SW2 SW3 Data CHK_SUM
+     *
+     * 1、Preamble:本帧数据的帧头,5 字节,为 0xAA、0xAA、0xAA、0x96、0x69。
+     * 2、Len1、Len2:数据帧的有效数据长度,各为 1 字节。Len1 为数据长度高字节;Len2为数据长度低字节。
+     *     输入数据长度为:CMD、Para、Data、CHK_SUM 字 段字节数 之和;
+     *     输出数据长度为:SW1、SW2、SW3、Data、CHK_SUM 字段字节数之和。
+     * 3、CHK_SUM:校验和,1 字节。
+     * 数据帧中除帧头和校验和之外 的数据逐字节按位异或的结果。
+     *
+     * 寻卡命令:AA AA AA 96 69 00 03 20 01 22
+     * 返 回 值:AA AA AA 96 69 00 08 00 00 9F 00 00 00 00 97
+     *
+     * 选卡命令:AA AA AA 96 69 00 03 20 02 21
+     * 返 回 值:AA AA AA 96 69 00 0C 00 00 90 00 00 00 00 00 00 00 00 9C
+     *
+     * 读卡命令:AA AA AA 96 69 00 03 30 01 32
+     * 返 回 值:1295 字节数据身份证信息
+     * AAAAAA9669050800009001000400(14字节)+(256 字节文字信息)+(1024 字节 照片信息)+(1 字节 CRC)
+     *
+     */
+    public static String FIND_ID_CARD = "AAAAAA96690003200122";
+
+    public static String SELECT_ID_CARD = "AAAAAA96690003200221";
+
+    public static String READ_ID_CARD = "AAAAAA96690003300132";
+
 }

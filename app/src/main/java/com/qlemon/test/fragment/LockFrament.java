@@ -1,9 +1,9 @@
-package com.qlemon.autotest;
+package com.qlemon.test.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +14,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.qlemon.test.bean.BoxBean;
+import com.qlemon.test.util.ConvertUtils;
+import com.qlemon.test.util.DevicesUtils;
+import com.qlemon.test.R;
+import com.qlemon.test.bean.SerialPortSendData;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +27,7 @@ import java.util.List;
  * 串口测试界面
  * @author JeanSit added at 2016-01-12
  */
-public class DeviceFrament extends Fragment {
+public class LockFrament extends Fragment {
 
     private String lockerCom;
     private Spinner lockerComSpinner;
@@ -39,13 +45,11 @@ public class DeviceFrament extends Fragment {
 
     Button perLockerStatusBtn;
 
-    Button scanBtn;
-
     private List<BoxBean> boxBeanList;
 
     private DevicesUtils device;
 
-    public DeviceFrament() {
+    public LockFrament() {
 
     }
 
@@ -91,13 +95,13 @@ public class DeviceFrament extends Fragment {
             @Override
             public void onClick(View view) {
                 lockerCom = ((TextView)lockerComSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerCom)) {
-                    errorText.setText("锁控板对应串口 不能为空");
+                if (ConvertUtils.isBlank(lockerCom)) {
+                    errorText.setText("串口设备 不能为空");
                     return;
                 }
                 lockerComBaudate = ((TextView) lockerComBaudateSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerComBaudate)) {
-                    errorText.setText("锁控板波特率 不能为空");
+                if (ConvertUtils.isBlank(lockerComBaudate)) {
+                    errorText.setText("波特率 不能为空");
                     return;
                 }
 
@@ -105,11 +109,11 @@ public class DeviceFrament extends Fragment {
 
                 lockerNum = lockerNumText.getText().toString();
 
-                if (StringUtils.isBlank(lockerBoardNum)) {
+                if (ConvertUtils.isBlank(lockerBoardNum)) {
                     errorText.setText("锁控板数量 不能为空");
                     return;
                 }
-                if (StringUtils.isBlank(lockerNum)) {
+                if (ConvertUtils.isBlank(lockerNum)) {
                     errorText.setText("每块锁控板的格口数 不能为空");
                     return;
                 }
@@ -129,18 +133,18 @@ public class DeviceFrament extends Fragment {
             @Override
             public void onClick(View v) {
                 lockerCom = ((TextView)lockerComSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerCom)) {
-                    errorText.setText("锁控板对应串口 不能为空");
+                if (ConvertUtils.isBlank(lockerCom)) {
+                    errorText.setText("串口设备 不能为空");
                     return;
                 }
                 lockerComBaudate = ((TextView) lockerComBaudateSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerComBaudate)) {
-                    errorText.setText("锁控板波特率 不能为空");
+                if (ConvertUtils.isBlank(lockerComBaudate)) {
+                    errorText.setText("波特率 不能为空");
                     return;
                 }
                 EditText lockerBoardNoText = (EditText)view.findViewById(R.id.lockerBoardNo);
                 String lockerBoardNo = lockerBoardNoText.getText().toString();
-                if (StringUtils.isBlank(lockerBoardNo)) {
+                if (ConvertUtils.isBlank(lockerBoardNo)) {
                     errorText.setText("锁控板编号　不能为空");
                     return;
                 }
@@ -155,51 +159,31 @@ public class DeviceFrament extends Fragment {
             @Override
             public void onClick(View v) {
                 lockerCom = ((TextView)lockerComSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerCom)) {
-                    errorText.setText("锁控板对应串口 不能为空");
+                if (ConvertUtils.isBlank(lockerCom)) {
+                    errorText.setText("串口设备 不能为空");
                     return;
                 }
                 lockerComBaudate = ((TextView) lockerComBaudateSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerComBaudate)) {
-                    errorText.setText("锁控板波特率 不能为空");
+                if (ConvertUtils.isBlank(lockerComBaudate)) {
+                    errorText.setText("波特率 不能为空");
                     return;
                 }
 
                 EditText lockerBoardNoText = (EditText)view.findViewById(R.id.lockerBoardNo);
                 String lockerBoardNo = lockerBoardNoText.getText().toString();
-                if (StringUtils.isBlank(lockerBoardNo)) {
+                if (ConvertUtils.isBlank(lockerBoardNo)) {
                     errorText.setText("锁控板编号 不能为空");
                     return;
                 }
                 EditText lockerNoText = (EditText)view.findViewById(R.id.lockerNo);
                 String lockerNo = lockerNoText.getText().toString();
-                if (StringUtils.isBlank(lockerNo)) {
+                if (ConvertUtils.isBlank(lockerNo)) {
                     errorText.setText("锁编号 不能为空");
                     return;
                 }
                 ((Button)v).setClickable(false);
                 device = new DevicesUtils();
                 openLockAndCheckStatus(device, lockerBoardNo, lockerNo);
-            }
-        });
-
-        scanBtn = (Button)view.findViewById(R.id.scanBtn);
-        scanBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                lockerCom = ((TextView)lockerComSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerCom)) {
-                    errorText.setText("锁控板对应串口 不能为空");
-                    return;
-                }
-                lockerComBaudate = ((TextView) lockerComBaudateSpinner.getSelectedView()).getText().toString();
-                if (StringUtils.isBlank(lockerComBaudate)) {
-                    errorText.setText("锁控板波特率 不能为空");
-                    return;
-                }
-                ((Button)v).setClickable(false);
-                device = new DevicesUtils();
-                scan(device);
             }
         });
 
@@ -211,7 +195,6 @@ public class DeviceFrament extends Fragment {
                 stopBtn.setClickable(true);
                 lockerStatusBtn.setClickable(true);
                 perLockerStatusBtn.setClickable(true);
-                scanBtn.setClickable(true);
             }
         });
 
@@ -266,12 +249,12 @@ public class DeviceFrament extends Fragment {
             String opencmd = "";
             StringBuilder data = new StringBuilder();
             data.append("8a");
-            data.append(StringUtils.convertDecToHexString(bean.board_no));
-            data.append(StringUtils.convertDecToHexString(bean.physic_no));
+            data.append(ConvertUtils.convertDecToHexString(bean.board_no));
+            data.append(ConvertUtils.convertDecToHexString(bean.physic_no));
             data.append("11");
-            final String checkDigit = StringUtils.xor(data.toString());
+            final String checkDigit = ConvertUtils.xor(data.toString());
             opencmd = data.append(checkDigit).toString();
-            final String openStopstr = "11" + StringUtils.xor(opencmd + "11");
+            final String openStopstr = "11" + ConvertUtils.xor(opencmd + "11");
             SerialPortSendData sendData = new SerialPortSendData(lockerCom, Integer.parseInt(lockerComBaudate), opencmd, "", "",openStopstr, false);
             //不监听时无须设置下面二个值
             sendData.special = SerialPortSendData.Signal.OPEN_LOCK.ordinal();
@@ -285,14 +268,14 @@ public class DeviceFrament extends Fragment {
      * @param device
      * @param board_no
      */
-    private void lockStatus(DevicesUtils device, String board_no) {
+    private void lockStatus(DevicesUtils device, final String board_no) {
         String statusCmd = "";
         StringBuilder data = new StringBuilder();
         data.append("80");
-        data.append(StringUtils.convertDecToHexString(board_no));
+        data.append(ConvertUtils.convertDecToHexString(board_no));
         data.append("00");
         data.append("33");
-        final String checkDigit = StringUtils.xor(data.toString());
+        final String checkDigit = ConvertUtils.xor(data.toString());
         statusCmd = data.append(checkDigit).toString();
         SerialPortSendData sendData = new SerialPortSendData(lockerCom, Integer.parseInt(lockerComBaudate), statusCmd, "", "", "", false);
         //监听时须设置以下二个值
@@ -301,7 +284,13 @@ public class DeviceFrament extends Fragment {
         device.toSend(getActivity(), sendData, new DevicesUtils.ReciverListener() {
             @Override
             public void onReceived(String receviceStr) {
-                errorText.setText(receviceStr);
+                StringBuilder desc = new StringBuilder();
+                byte[] byteArray = ConvertUtils.hexStringToByteArray(receviceStr, true);
+                int index = 1;
+                for (byte status : byteArray) {
+                    desc.append("锁控板编号").append(board_no).append("锁编号").append(index).append(status=='1'?"锁状态打开":"锁状态关闭").append("\n");
+                }
+                errorText.setText(desc.toString());
                 lockerStatusBtn.setClickable(true);
             }
 
@@ -328,12 +317,12 @@ public class DeviceFrament extends Fragment {
         StringBuilder data = new StringBuilder();
         StringBuilder statusCloseData = new StringBuilder();
         data.append("8a");
-        data.append(StringUtils.convertDecToHexString(board_no));
-        data.append(StringUtils.convertDecToHexString(locker_no));
+        data.append(ConvertUtils.convertDecToHexString(board_no));
+        data.append(ConvertUtils.convertDecToHexString(locker_no));
         statusCloseData.append(data.toString()).append("00");
         data.append("11");
-        final String closeStatus = statusCloseData.append(StringUtils.xor(statusCloseData.toString())).toString();
-        final String openCmd = data.append(StringUtils.xor(data.toString())).toString();
+        final String closeStatus = statusCloseData.append(ConvertUtils.xor(statusCloseData.toString())).toString();
+        final String openCmd = data.append(ConvertUtils.xor(data.toString())).toString();
         SerialPortSendData sendData = new SerialPortSendData(lockerCom, Integer.parseInt(lockerComBaudate), openCmd, "", "", "", false);
         sendData.special = SerialPortSendData.Signal.OPEN_LOCK.ordinal();
         sendData.digitNum = 10;
@@ -363,31 +352,5 @@ public class DeviceFrament extends Fragment {
         });
     }
 
-    private void scan(DevicesUtils device) {
-        SerialPortSendData sendData = new SerialPortSendData(lockerCom, Integer.parseInt(lockerComBaudate),
-                ScanConstants.SCAN_START, ScanConstants.SCAN_RSP_OK,
-                ScanConstants.SCAN_RSP_FAIL, ScanConstants.SCAN_STOP,
-                true);
-        sendData.special = SerialPortSendData.Signal.SCAN.ordinal();
-        sendData.digitNum = -1;
-        device.toSend(getActivity(), sendData, new DevicesUtils.ReciverListener() {
-            @Override
-            public void onReceived(String receviceStr) {
-                receviceStr = StringUtils.convertHexToString(receviceStr);
-                Log.i("TAG", "扫描返回"+receviceStr);
-                errorText.setText(receviceStr);
-                scanBtn.setClickable(true);
-            }
 
-            @Override
-            public void onFail(String fialStr) {
-
-            }
-
-            @Override
-            public void onErr(Exception e) {
-
-            }
-        });
-    }
 }

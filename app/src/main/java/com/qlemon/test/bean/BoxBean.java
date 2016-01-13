@@ -1,4 +1,4 @@
-package com.qlemon.autotest;
+package com.qlemon.test.bean;
 
 import java.io.Serializable;
 

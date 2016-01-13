@@ -1,4 +1,4 @@
-package com.qlemon.autotest;
+package com.qlemon.test.bean;
 
 import java.io.Serializable;
 
@@ -55,7 +55,7 @@ public class SerialPortSendData implements Serializable {
 	public int digitNum = 0; //输出流返回的位数
 	public int special = -1;
 	public enum Signal {
-        OPEN_LOCK, LOCK_STATUS, ALL_LOCK_STATUS, SCAN,
+        OPEN_LOCK, LOCK_STATUS, ALL_LOCK_STATUS, SCAN, FIND_ID_CARD, SELECT_ID_CARD, READ_ID_CARD
     }
 
 	/**
