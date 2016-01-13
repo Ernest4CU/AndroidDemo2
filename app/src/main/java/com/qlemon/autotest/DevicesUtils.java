@@ -98,6 +98,17 @@ public class DevicesUtils {
                                     && receiData.lastIndexOf(sendData.stopStr) > 0) {
                                 flag = true;
                             }
+                        } else if (sendData.special == SerialPortSendData.Signal.FIND_ID_CARD.ordinal()
+                                || sendData.special == SerialPortSendData.Signal.SELECT_ID_CARD.ordinal()) {
+                            //寻找身份证信息 或 选取身份证信息
+                            if (sb.toString().indexOf(sendData.stopStr) != -1) {
+                                flag = true;
+                            }
+                        } else if (sendData.special == SerialPortSendData.Signal.READ_ID_CARD.ordinal()) {
+                            //读取身份证信息(文字＋照片)＝14字节头＋(256 字节文字信息)+(1024 字节 照片信息)+(1 字节 CRC)
+                            if (sb.toString().length() >= sendData.digitNum) {
+                                flag = true;
+                            }
                         }
                         if (flag) {
                             final String msg = sb.toString();
