@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">小檬串口测试</string>
+    
+    <string-array name="comArray">
+        <item>/dev/ttyS1</item>
+        <item>/dev/ttyS2</item>
+        <item>/dev/ttyS3</item>
+        <item>/dev/ttyS4</item>
+        <item>/dev/ttyUSB0</item>
+        <item>/dev/ttyUSB1</item>
+        <item>/dev/ttyUSB2</item>
+        <item>/dev/ttyUSB3</item>
+    </string-array>
+
+    <string-array name="baudateArray">
+        <item>9600</item>
+        <item>4800</item>
+        <item>115200</item>
+    </string-array>
+</resources>
