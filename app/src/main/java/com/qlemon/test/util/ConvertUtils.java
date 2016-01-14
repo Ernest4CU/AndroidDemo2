@@ -1,5 +1,7 @@
 package com.qlemon.test.util;
 
+import android.util.Log;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -189,16 +191,12 @@ public class ConvertUtils {
      */
     public static byte[] hexStringToByteArray(String hex, boolean reverse) {
         StringBuilder sb = new StringBuilder();
-        if (reverse) {
-            for (int i=hex.length(); i>0; i--) {
-                sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i - 1, i), 16)), 4, '0'));
-            }
-        } else {
-            for (int i=0; i<hex.length(); i++) {
-                sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i, i+1), 16)), 4, '0'));
-            }
-        }
-
-        return sb.toString().getBytes();
+		for (int i=0; i<hex.length(); i++) {
+			sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i, i+1), 16)), 4, '0'));
+		}
+		if (reverse) {
+			return sb.reverse().toString().getBytes();
+		}
+		return sb.toString().getBytes();
     }
 }

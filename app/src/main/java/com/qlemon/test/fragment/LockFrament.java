@@ -14,11 +14,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.qlemon.test.DeviceConstants;
 import com.qlemon.test.bean.BoxBean;
 import com.qlemon.test.util.ConvertUtils;
 import com.qlemon.test.util.DevicesUtils;
 import com.qlemon.test.R;
 import com.qlemon.test.bean.SerialPortSendData;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +92,8 @@ public class LockFrament extends Fragment {
                     device.closeDevice();
                 }
                 handler.removeMessages(999);
+                currentIndex = 0;
+                errorText.setText("停止测试了");
             }
         });
         btn.setOnClickListener(new View.OnClickListener() {
@@ -248,13 +253,13 @@ public class LockFrament extends Fragment {
         if (null != device) {
             String opencmd = "";
             StringBuilder data = new StringBuilder();
-            data.append("8a");
+            data.append(DeviceConstants.LOCK_OPEN_CLOSE_HEADER);
             data.append(ConvertUtils.convertDecToHexString(bean.board_no));
             data.append(ConvertUtils.convertDecToHexString(bean.physic_no));
-            data.append("11");
+            data.append(DeviceConstants.LOCK_OPEN_STUATS);
             final String checkDigit = ConvertUtils.xor(data.toString());
             opencmd = data.append(checkDigit).toString();
-            final String openStopstr = "11" + ConvertUtils.xor(opencmd + "11");
+            final String openStopstr = "11" + ConvertUtils.xor(opencmd + DeviceConstants.LOCK_OPEN_STUATS);
             SerialPortSendData sendData = new SerialPortSendData(lockerCom, Integer.parseInt(lockerComBaudate), opencmd, "", "",openStopstr, false);
             //不监听时无须设置下面二个值
             sendData.special = SerialPortSendData.Signal.OPEN_LOCK.ordinal();
@@ -271,10 +276,10 @@ public class LockFrament extends Fragment {
     private void lockStatus(DevicesUtils device, final String board_no) {
         String statusCmd = "";
         StringBuilder data = new StringBuilder();
-        data.append("80");
+        data.append(DeviceConstants.LOCK_READ_HEADER);
         data.append(ConvertUtils.convertDecToHexString(board_no));
-        data.append("00");
-        data.append("33");
+        data.append(DeviceConstants.LOCK_CLOSE_STUATS);
+        data.append(DeviceConstants.LOCK_READ_STUATS);
         final String checkDigit = ConvertUtils.xor(data.toString());
         statusCmd = data.append(checkDigit).toString();
         SerialPortSendData sendData = new SerialPortSendData(lockerCom, Integer.parseInt(lockerComBaudate), statusCmd, "", "", "", false);
@@ -284,13 +289,17 @@ public class LockFrament extends Fragment {
         device.toSend(getActivity(), sendData, new DevicesUtils.ReciverListener() {
             @Override
             public void onReceived(String receviceStr) {
-                StringBuilder desc = new StringBuilder();
-                byte[] byteArray = ConvertUtils.hexStringToByteArray(receviceStr, true);
-                int index = 1;
-                for (byte status : byteArray) {
-                    desc.append("锁控板编号").append(board_no).append("锁编号").append(index).append(status=='1'?"锁状态打开":"锁状态关闭").append("\n");
+                if (StringUtils.isNotBlank(receviceStr)) {
+                    receviceStr = receviceStr.substring(6, 12);
+                    Log.i("TAG", receviceStr);
+                    StringBuilder desc = new StringBuilder();
+                    byte[] byteArray = ConvertUtils.hexStringToByteArray(receviceStr, true);
+                    int index = 1;
+                    for (byte status : byteArray) {
+                        desc.append("锁控板编号").append(board_no).append("锁编号").append(index++).append(status=='1'?"锁状态打开":"锁状态关闭").append("\n");
+                    }
+                    errorText.setText(desc.toString());
                 }
-                errorText.setText(desc.toString());
                 lockerStatusBtn.setClickable(true);
             }
 
@@ -316,10 +325,10 @@ public class LockFrament extends Fragment {
     private void openLockAndCheckStatus(DevicesUtils device, String board_no, String locker_no) {
         StringBuilder data = new StringBuilder();
         StringBuilder statusCloseData = new StringBuilder();
-        data.append("8a");
+        data.append(DeviceConstants.LOCK_OPEN_CLOSE_HEADER);
         data.append(ConvertUtils.convertDecToHexString(board_no));
         data.append(ConvertUtils.convertDecToHexString(locker_no));
-        statusCloseData.append(data.toString()).append("00");
+        statusCloseData.append(data.toString()).append(DeviceConstants.LOCK_CLOSE_STUATS);
         data.append("11");
         final String closeStatus = statusCloseData.append(ConvertUtils.xor(statusCloseData.toString())).toString();
         final String openCmd = data.append(ConvertUtils.xor(data.toString())).toString();
