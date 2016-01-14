@@ -293,7 +293,7 @@ public class LockFrament extends Fragment {
                     receviceStr = receviceStr.substring(6, 12);
                     Log.i("TAG", receviceStr);
                     StringBuilder desc = new StringBuilder();
-                    byte[] byteArray = ConvertUtils.hexStringToByteArray(receviceStr, true);
+                    byte[] byteArray = ConvertUtils.hexStringToByte(receviceStr, true);
                     int index = 1;
                     for (byte status : byteArray) {
                         desc.append("锁控板编号").append(board_no).append("锁编号").append(index++).append(status=='1'?"锁状态打开":"锁状态关闭").append("\n");

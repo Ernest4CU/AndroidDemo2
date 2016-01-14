@@ -77,6 +77,23 @@ public class ConvertUtils {
 		return baKeyword;
 	}
 
+    /**
+     * 十六进制字符串转换成字节数组
+     * @param hex 十六进制字符串
+     * @param reverse 值true是从尾开始读取字符串，值false是从头开始读取字符串
+     * @return 字节数组
+     */
+    public static byte[] hexStringToByte(String hex, boolean reverse) {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<hex.length(); i++) {
+            sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i, i+1), 16)), 4, '0'));
+        }
+        if (reverse) {
+            return sb.reverse().toString().getBytes();
+        }
+        return sb.toString().getBytes();
+    }
+
 	/**
 	 * 十六进制转ascii
 	 * 
@@ -182,21 +199,4 @@ public class ConvertUtils {
 		}
 		return false;
 	}
-
-    /**
-     * 十六进制字符串转换成字节数组
-     * @param hex 十六进制字符串
-     * @param reverse 值true是从尾开始读取字符串，值false是从头开始读取字符串
-     * @return 字节数组
-     */
-    public static byte[] hexStringToByteArray(String hex, boolean reverse) {
-        StringBuilder sb = new StringBuilder();
-		for (int i=0; i<hex.length(); i++) {
-			sb.append(StringUtils.leftPad(Integer.toBinaryString(Integer.parseInt(hex.substring(i, i+1), 16)), 4, '0'));
-		}
-		if (reverse) {
-			return sb.reverse().toString().getBytes();
-		}
-		return sb.toString().getBytes();
-    }
 }
