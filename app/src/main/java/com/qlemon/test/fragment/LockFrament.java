@@ -91,8 +91,10 @@ public class LockFrament extends Fragment {
                 if (null != device) {
                     device.closeDevice();
                 }
-                handler.removeMessages(999);
+                handler.removeMessages(9999);
+                boardHandler.removeMessages(9988);
                 currentIndex = 0;
+                boardIndex = 1;
                 errorText.setText("停止测试了");
             }
         });
@@ -127,8 +129,8 @@ public class LockFrament extends Fragment {
                     return;
                 }
                 assembleLockerInfo(Integer.valueOf(lockerBoardNum), Integer.valueOf(lockerNum));
-                device = new DevicesUtils(1500, false);
-                handler.sendEmptyMessageDelayed(999, 1500);
+                device = new DevicesUtils(false);
+                handler.sendEmptyMessageDelayed(9999, 1500);
                 errorText.setText("正在进行格口测试，请不要再点击按钮!");
             }
         });
@@ -154,8 +156,8 @@ public class LockFrament extends Fragment {
                     return;
                 }
                 ((Button)v).setClickable(false);
-                device = new DevicesUtils();
-                lockStatus(device, lockerBoardNo);
+                device = new DevicesUtils(false);
+                boardHandler.sendEmptyMessageDelayed(9988, 1500);
             }
         });
 
@@ -210,19 +212,42 @@ public class LockFrament extends Fragment {
 
     private int currentIndex = 0;
 
+    private int boardIndex = 1;
+
+    private Handler boardHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 9988:
+                    Log.i("TAG", "没有调用进入此方法中");
+                    if (boardIndex <= 4) {
+                        lockStatus(device, String.valueOf(boardIndex));
+                        ++boardIndex;
+                        boardHandler.sendEmptyMessageDelayed(9988, 1500);
+                    } else {
+                        device.closeDevice();
+                        boardHandler.removeMessages(9988);
+                        boardIndex = 1;
+                    }
+                default:
+                    Log.i("TAG", "nothing");
+            }
+        }
+    };
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 999:
+                case 9999:
                     if (currentIndex < total) {
                         openBox(device, boxBeanList.get(currentIndex++));
-                        handler.sendEmptyMessageDelayed(999, 1500);
+                        handler.sendEmptyMessageDelayed(9999, 1500);
                     } else {
                         device.closeDevice();
-                        handler.removeMessages(999);
+                        handler.removeMessages(9999);
                         currentIndex = 0;
-                        errorText.setText("自动开锁测试结束");
+                        lockerStatusBtn.performClick();
                     }
                 default:
                     Log.i("TAG", "nothing");
@@ -295,22 +320,24 @@ public class LockFrament extends Fragment {
                     StringBuilder desc = new StringBuilder();
                     byte[] byteArray = ConvertUtils.hexStringToByte(receviceStr, true);
                     int index = 1;
+                    desc.append("锁控板编号").append(board_no);
                     for (byte status : byteArray) {
-                        desc.append("锁控板编号").append(board_no).append("锁编号").append(index++).append(status=='1'?"锁状态打开":"锁状态关闭").append("\n");
+                        desc.append("(锁编号").append(index++).append(status=='1'?"打开)  ":"关闭)  ");
                     }
-                    errorText.setText(desc.toString());
+                    desc.append("\n");
+                    errorText.setText(errorText.getText().toString() + desc.toString());
                 }
                 lockerStatusBtn.setClickable(true);
             }
 
             @Override
             public void onFail(String fialStr) {
-                errorText.setText("锁状态检查发生了onFail失败");
+                errorText.setText("某块板的所有锁状态检查"+fialStr);
             }
 
             @Override
             public void onErr(Exception e) {
-                errorText.setText("锁状态检查发生了onErr错误");
+                errorText.setText("某块板的所有锁状态检查"+e.getMessage());
             }
 
         });
@@ -350,12 +377,12 @@ public class LockFrament extends Fragment {
 
             @Override
             public void onFail(String fialStr) {
-                errorText.setText("某块板的某块锁状态检查发生了onFail失败");
+                errorText.setText("某块板的某块锁状态检查失败"+fialStr);
             }
 
             @Override
             public void onErr(Exception e) {
-                errorText.setText("某块板的某块锁状态检查发生了onErr错误");
+                errorText.setText("某块板的某块锁状态检查异常"+e.getMessage());
             }
 
         });

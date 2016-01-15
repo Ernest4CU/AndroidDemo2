@@ -95,13 +95,13 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="全锁状态测试"
+            android:text="测试锁状态"
             android:id="@+id/lockerStatusBtn" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="单锁状态测试"
+            android:text="测试单锁状态"
             android:id="@+id/perLockerStatusBtn" />
 
         <Button

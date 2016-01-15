@@ -1,6 +1,7 @@
 package com.qlemon.test.util;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -39,11 +40,15 @@ public class DevicesUtils {
     private boolean autoClose = true;
 
     public DevicesUtils() {
-        this.timeout = 1500;
+        this.timeout = 3000;
     }
 
     public DevicesUtils(long timeout) {
         this.timeout = timeout;
+    }
+
+    public DevicesUtils(boolean autoClose) {
+        this.autoClose = autoClose;
     }
 
     public DevicesUtils(long timeout, boolean autoClose) {
@@ -55,6 +60,9 @@ public class DevicesUtils {
      * 从串口通信设备中获取返回数据的任务类
      */
     private class ReadTask implements Callable<RecevedData> {
+
+        long time = SystemClock.currentThreadTimeMillis();
+
         private SerialPortSendData sendData;
 
         public ReadTask(SerialPortSendData sendData) {
@@ -65,6 +73,9 @@ public class DevicesUtils {
         public RecevedData call() {
             StringBuilder sb = new StringBuilder();
             while (true) {
+                if (SystemClock.currentThreadTimeMillis() - time > timeout) {
+                    return new RecevedData(ReturnType.ERR, "ReadTask is timeout");
+                }
                 int size;
                 try {
                     byte[] buffer = new byte[1024];
@@ -79,17 +90,17 @@ public class DevicesUtils {
                         boolean flag = false;
                         if (sendData.special == SerialPortSendData.Signal.ALL_LOCK_STATUS.ordinal()) {
                             //锁状态检查：某块锁控板上所有的锁状态
-                            if (sb.toString().length() == 16) {
+                            if (sb.toString().length() == sendData.digitNum) {
                                 flag = true;
                             }
                         } else if (sendData.special == SerialPortSendData.Signal.LOCK_STATUS.ordinal()) {
                             //锁状态检查：某块锁控板上某个锁的状态
-                            if (sb.toString().length() == 10) {
+                            if (sb.toString().length() == sendData.digitNum) {
                                 flag = true;
                             }
                         } else if (sendData.special == SerialPortSendData.Signal.OPEN_LOCK.ordinal()) {
                             //开锁：打开某块锁控板上某个锁后一秒钟返加的状态(即返回锁状态检查的数据)
-                            if (sb.toString().length() == 10) {
+                            if (sb.toString().length() == sendData.digitNum) {
                                 flag = true;
                             }
                         } else if (sendData.special == SerialPortSendData.Signal.SCAN.ordinal()) {
@@ -156,7 +167,6 @@ public class DevicesUtils {
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
 
-//            deviceThreadPool.awaitTermination(timeout, TimeUnit.MILLISECONDS);
             if (null != listener) {
                 final Future<RecevedData> future = deviceThreadPool.submit(new ReadTask(sendData));
                 deviceThreadPool.submit(new Runnable() {

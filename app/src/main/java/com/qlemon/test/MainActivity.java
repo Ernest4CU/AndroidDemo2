@@ -49,9 +49,9 @@ public class MainActivity extends FragmentActivity implements TabHost.OnTabChang
             TabHost.TabSpec tabSpec = tabHost.newTabSpec(tagArray[i]).setIndicator(getTabItemView(i));
             tabHost.addTab(tabSpec, fragmentArray[i], null);
             if (i==0) {
-                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.BLUE);
+                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.GRAY);
             } else {
-                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.GREEN);
+                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.WHITE);
             }
         }
 
@@ -71,9 +71,9 @@ public class MainActivity extends FragmentActivity implements TabHost.OnTabChang
     public void onTabChanged(String tabId) {
         for (int i=0; i<tagArray.length; i++) {
             if (tabId.equals(tagArray[i])) {
-                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.BLUE);
+                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.GRAY);
             } else {
-                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.GREEN);
+                tabHost.getTabWidget().getChildTabViewAt(i).setBackgroundColor(Color.WHITE);
             }
         }
 

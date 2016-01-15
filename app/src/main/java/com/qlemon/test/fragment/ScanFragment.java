@@ -111,12 +111,14 @@ public class ScanFragment extends Fragment {
 
             @Override
             public void onFail(String fialStr) {
+                Log.i("TAG", "扫描失败"+fialStr);
                 device.closeDevice();
                 scanBtn.setClickable(true);
             }
 
             @Override
             public void onErr(Exception e) {
+                Log.e("TAG", "扫描异常"+e.getMessage(), e);
                 device.closeDevice();
                 scanBtn.setClickable(true);
             }
